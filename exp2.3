@@ -1,0 +1,70 @@
+#include <mylib.h>
+int flag = 1;
+int main(void)
+{
+
+    WDTCTL = WDTPW + WDTHOLD;
+    //实现按下 S1，跑马灯如果没有运行立即开始运行，如果跑马灯运行，则立即停止
+            Led_Init(LED_ALL);//初始化led
+            Button_Init(S_ALL);//初始化按键
+
+            Button_EnableIntterrupt(S1);//使能所有按键下降沿中断
+            _EINT();//开启全局中断
+            while(1){
+
+                if(flag==1)
+                {Led_On(LED1);
+                Led_Off(LED_ALL-LED1);
+                delay_ms(1000);}
+
+                if(flag==1)
+                {Led_On(LED2);
+                Led_Off(LED_ALL-LED2);
+                delay_ms(1000);}
+
+                if(flag==1)
+                {Led_On(LED3);
+                Led_Off(LED_ALL-LED3);
+                delay_ms(1000);}
+
+                if(flag==1)
+                {Led_On(LED4);
+                Led_Off(LED_ALL-LED4);
+                delay_ms(1000);}
+
+                if(flag==1)
+                {Led_On(LED5);
+                Led_Off(LED_ALL-LED5);
+                delay_ms(1000);}
+
+                if(flag==1)
+                {Led_On(LED6);
+                Led_Off(LED_ALL-LED6);
+                delay_ms(1000);}
+
+
+           if (flag==0)
+                {Led_Off(LED_ALL);}
+            }
+            return 0;
+}
+#pragma vector=PORT1_VECTOR//设置中断向量
+__interrupt void PORT1_key()
+{
+    _DINT();//先关闭全局中断，防止重复中断
+    if(P1IFG&BIT2)
+    {
+        delay_ms(1);//防抖
+      if(P1IFG&BIT2)
+    {
+
+          if(flag==1)
+              flag=0;
+          else if(flag==0)
+              flag=1;
+    }
+    }
+    P1IFG = 0x00;//清除中断标志位
+    _EINT();//开启全局中断
+}
+

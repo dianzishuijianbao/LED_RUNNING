@@ -1,0 +1,41 @@
+#include <mylib.h>
+
+int main(void)
+{
+    int flag = 1;
+    WDTCTL = WDTPW + WDTHOLD;
+    //按下S1或S2，跑马灯立即开始运行，按下S3或S4，跑马灯立即停止运行
+            Led_Init(LED_ALL);//初始化led
+            Button_Init(S_ALL);//初始化按键
+
+            Button_EnableIntterrupt(S_ALL);//使能所有按键下降沿中断
+            _EINT();//开启全局中断
+            while(1){
+            while(flag==1)
+            {
+                LED_RUNNING();
+
+            }
+           if (flag==0)
+                {Led_Off(LED_ALL);}
+            }
+            return 0;
+}
+#pragma vector=PORT1_VECTOR//设置中断向量
+__interrupt void PORT1_key()
+{
+    _DINT();//先关闭全局中断，防止重复中断
+     int flag=1;
+    P1IFG = 0x00;//清除中断标志位
+    _EINT();//开启全局中断
+}
+
+#pragma vector=PORT2_VECTOR//设置中断向量
+__interrupt void PORT2_key()
+{
+    _DINT();//先关闭全局中断，防止重复中断
+    int flag=0;
+
+    P2IFG = 0x00;//清除中断标志位
+    _EINT();//开启全局中断
+}
